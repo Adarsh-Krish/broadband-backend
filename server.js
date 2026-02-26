@@ -1,6 +1,5 @@
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
-  console.log("ALL ENV KEYS:", Object.keys(process.env).join(", "));
 }
 
 console.log("ALL dssdfssdfds ENV KEYS:", Object.keys(process.env).join(", "));
@@ -20,6 +19,8 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "http://localhost:5175",
+      "https://broadband-frontend.vercel.app",
+      /\.vercel\.app$/,
     ],
     credentials: true,
   }),
