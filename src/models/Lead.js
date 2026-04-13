@@ -2,14 +2,15 @@ const mongoose = require("mongoose");
 
 const leadSchema = new mongoose.Schema(
   {
-    business: { type: String, required: true },
-    contactName: { type: String },
+    fullName: { type: String, required: true },
+    businessName: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String },
-    address: { type: String },
-    postcode: { type: String, required: true },
-    partner: { type: String, default: "direct" },
-    package: { type: String, default: "Unknown" },
+    phone: { type: String, required: true },
+    address: { type: String, required: true },
+    currentProvider: { type: String, required: true },
+    monthlyPayment: { type: String, required: true },
+    contractEndDate: { type: String },
+    notes: { type: String },
     status: {
       type: String,
       enum: ["New", "Contacted", "Closed"],

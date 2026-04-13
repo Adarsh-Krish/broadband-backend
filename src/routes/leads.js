@@ -2,33 +2,58 @@ const express = require("express");
 const router = express.Router();
 const Lead = require("../models/Lead");
 const auth = require("../middleware/auth");
+const sendLeadEmail = require("../utils/sendEmail");
 
 // POST /api/leads — public
 router.post("/", async (req, res) => {
   try {
     const {
-      business,
-      contactName,
+      fullName,
+      businessName,
       email,
       phone,
       address,
-      postcode,
-      partner,
-      package: pkg,
+      currentProvider,
+      monthlyPayment,
+      contractEndDate,
+      notes,
     } = req.body;
-    if (!business || !email || !postcode) {
-      return res.status(400).json({ error: "Missing required fields" });
+
+    if (
+      !fullName ||
+      !businessName ||
+      !email ||
+      !phone ||
+      !address ||
+      !currentProvider ||
+      !monthlyPayment
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Please fill in all required fields" });
     }
+
     const lead = await Lead.create({
-      business,
-      contactName,
+      fullName,
+      businessName,
       email,
       phone,
       address,
-      postcode,
-      partner: partner || "direct",
-      package: pkg || "Unknown",
+      currentProvider,
+      monthlyPayment,
+      contractEndDate,
+      notes,
     });
+
+    // Send email notification
+    try {
+      await sendLeadEmail(lead);
+      console.log("✅ Email sent for lead:", lead._id);
+    } catch (emailErr) {
+      console.error("❌ Email failed:", emailErr.message);
+      // Don't fail the request if email fails
+    }
+
     const reference = `BB-${lead._id.toString().slice(-5).toUpperCase()}`;
     res.status(201).json({ success: true, reference, lead });
   } catch (err) {
@@ -40,18 +65,6 @@ router.post("/", async (req, res) => {
 router.get("/", auth, async (req, res) => {
   try {
     const leads = await Lead.find().sort({ createdAt: -1 });
-    res.json(leads);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/leads/partner/:slug
-router.get("/partner/:slug", auth, async (req, res) => {
-  try {
-    const leads = await Lead.find({ partner: req.params.slug }).sort({
-      createdAt: -1,
-    });
     res.json(leads);
   } catch (err) {
     res.status(500).json({ error: err.message });
