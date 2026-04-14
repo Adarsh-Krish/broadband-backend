@@ -1,21 +1,10 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendLeadEmail = async (lead) => {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
+  const { error } = await resend.emails.send({
+    from: "BroadbandConnect <onboarding@resend.dev>",
     to: process.env.EMAIL_TO,
     subject: `New Broadband Lead — ${lead.fullName} (${lead.businessName})`,
     html: `
@@ -99,12 +88,13 @@ const sendLeadEmail = async (lead) => {
             </a>
           </div>
         </div>
-
       </div>
     `,
-  };
+  });
 
-  await transporter.sendMail(mailOptions);
+  if (error) {
+    throw new Error(error.message);
+  }
 };
 
 module.exports = sendLeadEmail;
