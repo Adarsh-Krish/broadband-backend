@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-console.log("ALL dssdfssdfds ENV KEYS:", Object.keys(process.env).join(", "));
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./src/db/connect");
